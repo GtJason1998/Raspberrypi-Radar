@@ -13,8 +13,11 @@ shieldCell = 4
 referenceCell = n - shieldCell
 factor_T = P_fa**(-1/referenceCell) - 1   
 print(factor_T)
+#factor_T = 0 - np.log(P_fa)
+#print(factor_T)
 CFAR_xLabel = fvec[int(n/2)-1:fvec.shape[0]-int(n/2)].copy()
 CFAR_Level = np.zeros(CFAR_xLabel.shape[0],dtype=float)
+#WindowFunction = np.ones(fvec.shape[0])
 
 N = 35
 for i in range(1,N):
@@ -28,8 +31,8 @@ for i in range(1,N):
     #inPhase = np.loadtxt('./realPart/inPhase'+str(i)+'.txt')
     #Quadrature = np.loadtxt('./imaginaryPart/Quadrature'+str(i)+'.txt')
     CFAR_Level = CFAR_Level*factor_T
-    plt.plot(fvec/1000,Doppler)
-    plt.plot(CFAR_xLabel/1000,CFAR_Level)
+    plt.plot(fvec/1000,10*np.log10(Doppler/np.max(Doppler)))
+    plt.plot(CFAR_xLabel/1000,10*np.log10(CFAR_Level/np.max(CFAR_Level)))
     plt.title('Amplitude'+str(i))
     plt.legend(['Amplitude','CA-CFAR'])
     plt.xlabel('frequency/KHz')
