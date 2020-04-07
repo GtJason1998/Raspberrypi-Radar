@@ -8,7 +8,7 @@ from pylab import fft,fftshift,datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
-N = 64
+N = 32
 M = 10
 Ivec = np.zeros(N)
 Qvec = np.zeros(N)
@@ -16,17 +16,18 @@ ramp = np.linspace(0,1,N)
 
 # Radar parameters
 c0 = 299792458.              # Speed of light in vacuum
-fs = 15000                   # Sample frequency
+fs = 30000                   # Sample frequency
 f1 = 24.05e9                 # Start frequency
 f2 = 24.45e9                 # Stop frequency, using external amplifier
 f0 = (f1 + f2)/2             # Center frequency
 lambda0 = c0/f0              # Center wavelength
 B = f2 - f1                  # Absolute bandwidth
-Npad = 2                     # Factor to expand data vector with zeros
+Npad = 4                     # Factor to expand data vector with zeros
 Mpad = 10                    # Factor to expand data vector with zeros in Doppler-FFT
 V0 = 2                       # Maximum modulation voltage
 windowFunction1 = np.hanning(N) # windowFunction
 windowFunction2 = np.hanning(M) # windowFunction
+Rres = c0/(2*B*Npad)
 
 measureData = np.zeros((M,N),dtype=complex)
 sigRWin = np.zeros((M,N),dtype=complex)
@@ -53,27 +54,30 @@ try:
     ADC.ADS1256_init()
     DAC.DAC8532_Out_Voltage(DAC8532.channel_A, 0)
     DAC.DAC8532_Out_Voltage(DAC8532.channel_B, 0)
-    plt.figure(1)
     
+    j = 0
     while(1):
+        j = j + 1
+        T1 = 0                       # Up_Chirp Time
         # Up-chirp pulse
         for i in range(0,M):
-            #T1 = 0                       # Up_Chirp Time
             for n in np.arange(0,N):
-                #StartTime1 = datetime.datetime.now()         # Get start time 
+                StartTime1 = datetime.datetime.now()         # Get start time 
                 DAC.DAC8532_Out_Voltage(DAC8532.channel_A,V0*n/N)
-                #EndTime1 = datetime.datetime.now()           # Get end time
-                #T1 = T1 + (EndTime1 - StartTime1).total_seconds() # Compute total time
+                EndTime1 = datetime.datetime.now()           # Get end time
+                T1 = T1 + (EndTime1 - StartTime1).total_seconds() # Compute total time
                 ADC_Value = ADC.ADS1256_GetIQ()
                 Ivec[n] = ADC_Value[0]*5.0/0x7fffff
                 Qvec[n] = ADC_Value[1]*5.0/0x7fffff
             #print('i = ',i)
-            #print('T1 = ',T1)
             analyzeSignal1 = Ivec + 1j*Qvec
             amplitude, offset = EstimateAmplitudeOffset(analyzeSignal1, ramp)
             analyzeSignal1 = analyzeSignal1 - (amplitude*ramp + offset)
             measureData[i,:] = analyzeSignal1
-        
+        T1 = T1/M
+        print('T1 = ',T1)
+        Vres = c0/(2*f0*T1*M*Mpad)
+
         for ii in range(M):
             sigRWin[ii,:] = measureData[ii,:]*windowFunction1
         
@@ -86,11 +90,22 @@ try:
         for ii in range(N*Npad):
             sigDfft[:,ii] = fftshift(fft(sigDWin[:,ii],M*Mpad))
         
-        
-        plt.contourf(np.abs(sigDfft))
+        plt.figure(1)
+        plt.contourf(Rres*np.arange(1,N*Npad+1),Vres*(np.arange(1,M*Mpad+1) - M*Mpad/2),np.abs(sigDfft))
+        plt.xlabel('Range/m')
+        plt.ylabel('Velocity/mps')
         plt.pause(0.000001)
         plt.cla()
         
+        np.savetxt('./Rres/Rres'+str(j)+'.txt',Rres*np.arange(1,N*Npad+1))
+        np.savetxt('./Vres/Vres'+str(j)+'.txt',Vres*(np.arange(1,M*Mpad+1) - M*Mpad/2))
+        np.savetxt('./sigDfft/sigDfft'+str(j)+'.txt',np.abs(sigDfft))
+        
+        '''
+        plt.contourf(Rres*np.arange(1,N*Npad+1),np.arange(1,M+1),np.abs(sigRfft))
+        plt.xlabel('Range/m')
+        plt.ylabel('Frame')
+        '''
 except Exception as e:
     print(e)
     GPIO.cleanup()

@@ -17,16 +17,27 @@ ramp = np.linspace(0,1,N)
 # Radar parameters
 c0 = 299792458.              # Speed of light in vacuum
 fs = 7500                    # Sample frequency
-f1 = 24.05e9                 # Start frequency
-f2 = 24.45e9                 # Stop frequency, using external amplifier
-f0 = (f1 + f2)/2             # Center frequency
+F1 = 24.05e9                 # Start frequency
+F2 = 24.45e9                 # Stop frequency, using external amplifier
+f0 = (F1 + F2)/2             # Center frequency
 lambda0 = c0/f0              # Center wavelength
-B = f2 - f1                  # Absolute bandwidth
+B = F2 - F1                  # Absolute bandwidth
 Nave = 1                     # Number of averaging pulses
-Npad = 2                     # Factor to expand data vector with zeros
+Npad = 4                     # Factor to expand data vector with zeros
 V0 = 2                       # Maximum modulation voltage
-windowFunction = np.hanning(N) #windowFunction
+windowFunction = np.hamming(N) #windowFunction
+f1 = fftshift(fftfreq(Npad*N, d=1/fs)) #Up-Chirp XLabel in frequency domain
+f2 = fftshift(fftfreq(Npad*N, d=1/fs)) #Down-Chirp XLabel in frequency domain
 
+#CFAR
+P_fa = 10**(-6)
+n_CFAR = 16
+windowSize = n_CFAR + 1
+shieldCell = 2
+referenceCell = n_CFAR - shieldCell
+factor_T = P_fa**(-1/referenceCell) - 1
+CFAR_xLabel = f1[int(n_CFAR/2)-1:f1.shape[0]-int(n_CFAR/2)].copy()
+CFAR_Level = np.zeros(CFAR_xLabel.shape[0],dtype=float)
 # Define a convenient signal processing function
 def EstimateAmplitudeOffset(f, f0):
     """Estimate amplitude and offset of f0 to minimize distance to f."""
@@ -86,34 +97,51 @@ try:
         amplitude, offset = EstimateAmplitudeOffset(analyzeSignal2, ramp)
         analyzeSignal2 = analyzeSignal2 - (amplitude*ramp + offset)
 
-        analyzeSignal1 = analyzeSignal1*windowFunction
-        analyzeSignal2 = analyzeSignal2*windowFunction
+        analyzeSignal1 = 5*analyzeSignal1*windowFunction
+        analyzeSignal2 = 5*analyzeSignal2*windowFunction
 
         # Convert to frequency domain and analyze
         # The 'Npad' factor enables zero-padding the data for interpolation and nicer plots
         a1_f = fftshift(fft(analyzeSignal1, n=Npad*N))
         a2_f = fftshift(fft(analyzeSignal2, n=Npad*N))
-        f1 = fftshift(fftfreq(Npad*N, d=1/fs))
-        f2 = fftshift(fftfreq(Npad*N, d=1/fs))
-
+        A1_f = abs(a1_f)
+        A2_f = abs(a2_f)
+        
+        #CFAR
+        for j in np.arange(CFAR_xLabel.shape[0]):
+            #print("j+windowSize = ",j+windowSize)
+            CFAR_Level[j] = np.sum(A1_f[j:j+windowSize].copy())
+            for k in np.arange(1,int(shieldCell/2)+1):
+                CFAR_Level[j] = CFAR_Level[j] - A1_f[j+int(n_CFAR/2)-k] - A1_f[j+int(n_CFAR/2)+k]
+            CFAR_Level[j] = CFAR_Level[j] - A1_f[j+int(n_CFAR/2)]
+            CFAR_Level[j] = CFAR_Level[j]/referenceCell
+        CFAR_Level = CFAR_Level*factor_T
         # Compute the delta frequencies corresponding to the maximum peaks 
         # in up-chirp and down-chirp
+        temp = f1[int(n_CFAR/2)-1:f1.shape[0]-int(n_CFAR/2)]
+        #targetNum = temp[A1_f[int(n_CFAR/2)-1:f1.shape[0]-int(n_CFAR/2)] > CFAR_Level].shape[0]
+        #print("target_num = ",targetNum)
+        
         df1 = f1[abs(a1_f) == max(abs(a1_f))][0]
         df2 = f2[abs(a2_f) == max(abs(a2_f))][0]
         #print("f_b = ",abs(df1 - df2)/2)
         #print("f_d = ",(df1 + df2)/2)
+        #print("f1 = ",df1)
+        #print("f2 = ",df2)
         
         plt.figure(1)
-        plt.plot(f1,abs(a1_f))
+        plt.plot(f1,(abs(a1_f)))
+        plt.plot(temp,(CFAR_Level))
+        #plt.plot(real(analyzeSignal1))
         plt.pause(0.001)
-        plt.clf()
+        plt.cla()
         plt.figure(2)
         plt.plot(f2,abs(a2_f))
         plt.pause(0.001)
-        plt.clf()
-
-        R = ((c0)/(4*B))*abs(T2*df2 - T1*df1)
-        v = (c0/(4*f0))*(df1 + df2)
+        plt.cla()
+        
+        R = ((c0)/(4*B))*abs(T2*df2 + T1*df1)
+        v = (c0/(4*f0))*(df1 - df2)
         
 
         print("R = ",R)

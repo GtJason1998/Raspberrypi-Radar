@@ -7,11 +7,13 @@ import DAC8532
 import RPi.GPIO as GPIO
 from pylab import *
 import matplotlib.pyplot as plt
+import numpy as np
 
-N = 512
+N = 128
 analyzeSignal = zeros(N,dtype=complex)
 C = 3*10**8
 f_vco = 24.35*10**9
+windowFunction = np.hamming(N)
 
 try:
     ADC = ADS1256.ADS1256()
@@ -33,19 +35,22 @@ try:
             #print("\33[9A")
         #endtime = datetime.datetime.now()
         #T = (endtime - starttime).total_seconds()
+        analyzeSignal = analyzeSignal*2
         m = mean(analyzeSignal)
+        analyzeSignal = (analyzeSignal - m)*windowFunction
         #print("mean = ",m)
         #print("fs = ",N/T," Hz")
-        a_f = fftshift(fft(analyzeSignal - m))
-        fvec = fftshift(fftfreq(N,d = 1/7500))
+        a_f = fftshift(fft(analyzeSignal,4*N))
+        fvec = fftshift(fftfreq(4*N,d = 1/7500))
         f = fvec[abs(a_f) == max(abs(a_f))][0]
         v = (f*C)/(2*f_vco)
         print("Doppler frequency = {0:10.2f} Hz".format(f))
         print("Velocity          = {0:10.2f} m/s".format(v))
-        plt.plot(fvec,abs(a_f))
+        plt.plot(fvec,10*np.log10(abs(a_f)))
+        #plt.plot(real(analyzeSignal))
         plt.grid()
         plt.pause(0.001)
-        plt.clf()
+        plt.cla()
         #np.savetxt('./amplitude/Doppler.txt',abs(a_f))
         #np.savetxt('./realPart/inPhase.txt',real(analyzeSignal))
         #np.savetxt('./imaginaryPart/Quadrature.txt',imag(analyzeSignal))
