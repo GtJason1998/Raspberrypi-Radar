@@ -57,11 +57,11 @@ figure,image(Rres*[1:N*Npad],[1:L],10*log10(abs(sigRfft))),title('Range - FFT')
 xlabel('Range/m'),ylabel('Frame');
 figure,mesh(abs(sigRfft)),title('Range-FFT');
 figure,image(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
 figure,mesh(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
 xlim([0 45]);
 ylim([-18 18]);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
 
 %% Window Test
 
@@ -87,14 +87,14 @@ end
 
 figure(1),
 subplot(221),image(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('¼Ó¾ØĞÎ´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('åŠ çŸ©å½¢çª—');
 figure(2),
 subplot(221),mesh(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
 xlim([0 45]);
 ylim([-18 18]);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
-title('¼Ó¾ØĞÎ´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
+title('åŠ çŸ©å½¢çª—');
 
 
 hanning1 = hanning(N,'periodic');
@@ -119,14 +119,14 @@ end
 
 figure(1),
 subplot(222),image(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('¼ÓººÄş´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('åŠ æ±‰å®çª—');
 figure(2),
 subplot(222),mesh(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
 xlim([0 45]);
 ylim([-18 18]);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
-title('¼ÓººÄş´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
+title('åŠ æ±‰å®çª—');
 
 hanning1 = hamming(N,'periodic');
 sigRWin = zeros(L,N);
@@ -150,14 +150,14 @@ end
 
 figure(1),
 subplot(223),image(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('¼ÓººÃ÷´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('åŠ æ±‰æ˜çª—');
 figure(2),
 subplot(223),mesh(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
 xlim([0 45]);
 ylim([-18 18]);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
-title('¼ÓººÃ÷´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
+title('åŠ æ±‰æ˜çª—');
 
 hanning1 = blackman(N,'periodic');
 sigRWin = zeros(L,N);
@@ -181,14 +181,14 @@ end
 
 figure(1),
 subplot(224),image(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('¼Ó²¼À³¿ËÂü´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('åŠ å¸ƒè±å…‹æ›¼çª—');
 figure(2),
 subplot(224),mesh(Rres*[1:N*Npad],Vres*([1:L*Lpad] - L*Lpad/2),10*log10(abs(sigDfft)));
 xlim([0 45]);
 ylim([-18 18]);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
-title('¼Ó²¼À³¿ËÂü´°');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
+title('åŠ å¸ƒè±å…‹æ›¼çª—');
 %% 2D CA-CFAR
 Pfa = 10^(-6);
 Rres_rdm = c/(2*B);
@@ -222,21 +222,21 @@ CFAR_MapRange_Dim = Range_Dim(1 + handleWindow_r - proCell_r:N - (handleWindow_r
 CFAR_MapVelocity_Dim = Velocity_Dim(1 + handleWindow_c - proCell_c:N - (handleWindow_c - proCell_c));
 figure,subplot(121);
 mesh(Range_Dim,Velocity_Dim,10*log10(Range_Dopple_Map));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
 title('2D-FFT')
 subplot(122);
 mesh(CFAR_MapRange_Dim,CFAR_MapVelocity_Dim,10*log10(CFAR_Map));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ/dB');
-title('2D-CFAR¼ì²âÅĞ¾öÃÅÏŞ')
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼/dB');
+title('2D-CFARæ£€æµ‹åˆ¤å†³é—¨é™')
 
 figure,subplot(121);
 image(Range_Dim,Velocity_Dim,10*log10(Range_Dopple_Map));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('¾àÀë¶àÆÕÀÕÍ¼');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('è·ç¦»å¤šæ™®å‹’å›¾');
 subplot(122);
 image(CFAR_MapRange_Dim,CFAR_MapVelocity_Dim,10*log10(CFAR_Map));
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
-title('2D-CFAR¼ì²âÅĞ¾öÃÅÏŞ')
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
+title('2D-CFARæ£€æµ‹åˆ¤å†³é—¨é™')
 
 CRange_Dopple_Map = Range_Dopple_Map(1 + handleWindow_r - proCell_r:N - (handleWindow_r - proCell_r),1 + handleWindow_c - proCell_c:N - (handleWindow_c - proCell_c));
 [comR comC] = find(CRange_Dopple_Map < CFAR_Map);
@@ -245,6 +245,6 @@ for i = 1:length(comR)
 end
 
 figure,mesh(CFAR_MapRange_Dim,CFAR_MapVelocity_Dim,CRange_Dopple_Map);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps'),zlabel('·ùÖµ');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps'),zlabel('å¹…å€¼');
 figure,image(CFAR_MapRange_Dim,CFAR_MapVelocity_Dim,CRange_Dopple_Map);
-xlabel('¾àÀë/m'),ylabel('ËÙ¶È/mps');
+xlabel('è·ç¦»/m'),ylabel('é€Ÿåº¦/mps');
